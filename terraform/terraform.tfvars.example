@@ -1,0 +1,7 @@
+# Copie para terraform.tfvars (arquivo ignorado pelo git) e preencha com seus
+# valores reais antes de rodar terraform plan/apply.
+
+project_id = "seu-projeto-gcp-aqui"
+
+# Restrinja ao seu IP antes de aplicar em producao, ex: ["203.0.113.4/32"]
+ssh_source_ranges = ["0.0.0.0/0"]

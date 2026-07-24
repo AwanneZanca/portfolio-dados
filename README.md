@@ -32,6 +32,7 @@ flowchart TD
 
     Looker[Looker Studio]
     Jenkins[Jenkins CI/CD]
+    Terraform[Terraform]
 
     BACEN --> BH
     IBGE --> IH
@@ -40,6 +41,8 @@ flowchart TD
     Gold --> Looker
     Jenkins --> BH
     Jenkins --> IH
+    Terraform -->|provisiona VM e IAM| BH
+    Terraform -->|provisiona datasets| Bronze
 ```
 
 ---
@@ -54,6 +57,7 @@ flowchart TD
 | Transformação | dbt Core 1.11 |
 | CI/CD | Jenkins LTS |
 | Infraestrutura | Docker + GCP (VM e2-medium) |
+| IaC | Terraform |
 | Versionamento | GitHub + Webhook |
 | Visualização | Looker Studio |
 
@@ -177,6 +181,7 @@ pipeline-dados-GCP-Bacen/
   │   │   └── gold/       → dim_tempo, dim_indicador, fato_indicadores
   │   └── dbt_project.yml
   ├── imagens/            → Screenshots do projeto
+  ├── terraform/          → IaC: VM, IP estatico, firewall, service account e datasets BigQuery
   ├── Jenkinsfile         → Pipeline CI/CD
   └── docker-compose.yaml → Infraestrutura local (LocalExecutor)
 ```
