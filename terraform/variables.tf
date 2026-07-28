@@ -1,5 +1,5 @@
 variable "project_id" {
-  description = "ID do projeto GCP onde a infraestrutura sera criada"
+  description = "ID do projeto GCP onde a infraestrutura ja existe"
   type        = string
 }
 
@@ -10,7 +10,7 @@ variable "region" {
 }
 
 variable "zone" {
-  description = "Zona GCP para a VM"
+  description = "Zona GCP da VM"
   type        = string
   default     = "us-central1-a"
 }
@@ -18,25 +18,19 @@ variable "zone" {
 variable "vm_name" {
   description = "Nome da instancia que roda Airflow + dbt via Docker Compose"
   type        = string
-  default     = "airflow-bacen-vm"
+  default     = "portfolio-dados"
 }
 
 variable "machine_type" {
-  description = "Tipo de maquina da VM (2 vCPU, 4GB RAM conforme documentado no README)"
+  description = "Tipo de maquina da VM"
   type        = string
-  default     = "e2-medium"
+  default     = "e2-standard-2"
 }
 
 variable "boot_disk_size_gb" {
   description = "Tamanho do disco de boot em GB"
   type        = number
-  default     = 30
-}
-
-variable "ssh_source_ranges" {
-  description = "Faixas de IP autorizadas a acessar SSH (22) e a UI do Airflow (8080). Restrinja ao seu IP em producao."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = 20
 }
 
 variable "bq_dataset_prefix" {
@@ -48,7 +42,7 @@ variable "bq_dataset_prefix" {
 variable "bq_location" {
   description = "Localizacao dos datasets BigQuery"
   type        = string
-  default     = "US"
+  default     = "us-central1"
 }
 
 variable "labels" {
