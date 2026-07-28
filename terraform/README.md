@@ -1,33 +1,44 @@
 # Infraestrutura (Terraform)
 
-Provisiona, de forma declarativa, a infraestrutura GCP que hoje o [README raiz](../README.md)
-descreve como criada manualmente:
+Rastreia como código a infraestrutura GCP que já existe e roda em produção — não cria
+do zero. Os 10 recursos abaixo foram trazidos para o Terraform via `terraform import`,
+preservando exatamente o que já estava provisionado manualmente:
 
-- VM `e2-medium` (Ubuntu 22.04 LTS) onde roda o Airflow + dbt via Docker Compose, com
-  Docker instalado automaticamente no boot (`metadata_startup_script`).
-- IP externo estático.
-- Firewall liberando apenas SSH (22) e a UI do Airflow (8080), restrito às faixas de IP
-  definidas em `ssh_source_ranges`.
-- Service Account dedicada para a VM acessar o BigQuery (substitui o `gcp_credentials.json`
-  montado manualmente hoje).
-- Os 3 datasets BigQuery da arquitetura Medallion (`*_bronze`, `*_silver`, `*_gold`).
+- VM `portfolio-dados` (`e2-standard-2`, Ubuntu 22.04 LTS) onde roda o Airflow + dbt via
+  Docker Compose.
+- IP externo estático `airflow-ip`.
+- Firewalls existentes `allow-airflow` (porta 8080) e `allow-jenkins` (porta 8081).
+- Service Account `airflow-bigquery` (usada via chave JSON montada no container do
+  Airflow, ver `docker-compose.yaml`) com os papéis `bigquery.dataEditor` e
+  `bigquery.studioUser`.
+- Os 3 datasets BigQuery da arquitetura Medallion (`*_bronze`, `*_silver`, `*_gold`),
+  em `us-central1`.
+
+A VM tem `lifecycle.ignore_changes = all` — o Terraform rastreia o recurso mas nunca
+tenta alterá-lo, evitando risco de recriar uma instância real por causa de atributos
+computados pela API (shielded VM, scheduling, metadata de SSH) que este código não
+modela.
 
 ## Uso
 
 ```bash
 cd terraform
 cp terraform.tfvars.example terraform.tfvars
-# edite terraform.tfvars com seu project_id e (recomendado) restrinja ssh_source_ranges
+# edite terraform.tfvars com seu project_id
 
 terraform init
-terraform plan
-terraform apply
+terraform plan   # deve mostrar "No changes" se nada mudou na infra real
 ```
 
 **Nunca commite `terraform.tfvars` nem `*.tfstate`** — já estão no `.gitignore` local
 desta pasta. Em uso real, o `.tfstate` deveria ficar num backend remoto (ex: bucket GCS),
 não local — isso não está configurado aqui de propósito, para manter o exemplo simples de
 rodar.
+
+## Se for recriar essa infra em outro projeto GCP do zero
+
+Remova o `lifecycle.ignore_changes` da VM e rode `terraform apply` normalmente — sem
+recursos existentes para importar, ele cria tudo novo.
 
 ## O que NÃO está aqui
 
